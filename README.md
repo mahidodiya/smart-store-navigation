@@ -6,7 +6,7 @@ floor-plan map. It combines a product-selection/cart flow, A*-based route
 optimization with crowd-aware rerouting, a live budget tracker, voice
 search, Hindi/English support, and a store-manager analytics dashboard.
 
-# live link : https://easygo-smso.onrender.com/
+## live link : https://easygo-smso.onrender.com/
 
 ## Why it helps
 
