@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manager Dashboard — EasyGo</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>
+  tailwind = { config: { theme: { extend: {
+    colors: {
+      paper: '#FFFFFF', cream: '#FBFAF6', ink: '#17170F', fog: '#8A8A7C', line: '#EAE7DC',
+      sun:   { 50:'#FFFBEA', 100:'#FFF3C4', 300:'#FFDE73', DEFAULT:'#FFC300', 600:'#E6A800', 700:'#B8860B' },
+      sky:   { 50:'#EEF2FF', 100:'#DCE4FF', DEFAULT:'#2952E3', 700:'#1B3AB0' },
+      berry: { 50:'#FDECEC', 100:'#FBD7D5', DEFAULT:'#E23B32', 700:'#B32921' },
+      teal:  { 50:'#ECFDF5', 100:'#D1FAE5', DEFAULT:'#0EA5A5', 700:'#0F766E' }
+    },
+    fontFamily: { display: ['"Space Grotesk"', 'sans-serif'], body: ['Inter', 'sans-serif'] }
+  } } } };
+</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="/assets/common.css">
+</head>
+<body class="bg-cream text-ink antialiased min-h-screen flex flex-col">
+
+<header class="app-header">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+    <a href="/" class="flex items-center gap-3 min-w-0">
+      <div class="brand-badge"><i class="fa-solid fa-basket-shopping text-ink text-lg"></i></div>
+      <div class="min-w-0">
+        <h1 class="text-lg font-bold tracking-tight leading-none font-display truncate">EasyGo</h1>
+        <p class="text-[11px] text-fog leading-tight mt-0.5" data-i18n="dash_title">Store manager dashboard</p>
+      </div>
+    </a>
+    <div class="flex items-center gap-2.5">
+      <div class="lang-toggle"><button data-lang="en">EN</button><button data-lang="hi">हिं</button></div>
+      <a href="/shop.html" class="btn-ghost px-3 py-1.5 text-xs inline-flex items-center gap-1.5">
+        <i class="fa-solid fa-basket-shopping"></i> <span data-i18n="nav_shop">Shop</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 py-6 flex-1 w-full">
+  <div class="mb-6">
+    <h2 class="text-2xl font-bold font-display" data-i18n="dash_title">Store manager dashboard</h2>
+    <p class="text-sm text-fog" data-i18n="dash_sub">Aggregated, anonymized shopper-route analytics</p>
+  </div>
+
+  <!-- KPI cards -->
+  <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
+    <div class="card p-4">
+      <div class="w-8 h-8 rounded-lg bg-sky-50 flex items-center justify-center mb-2"><i class="fa-solid fa-route text-sky text-sm"></i></div>
+      <span id="kpi-routes" class="block text-2xl font-bold font-display">0</span>
+      <span class="text-[11px] text-fog font-semibold" data-i18n="dash_total_routes">Routes computed</span>
+    </div>
+    <div class="card p-4">
+      <div class="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center mb-2"><i class="fa-solid fa-person-walking text-teal-700 text-sm"></i></div>
+      <span id="kpi-saved" class="block text-2xl font-bold font-display">0 m</span>
+      <span class="text-[11px] text-fog font-semibold" data-i18n="dash_saved">Distance saved</span>
+    </div>
+    <div class="card p-4">
+      <div class="w-8 h-8 rounded-lg bg-sun-50 flex items-center justify-center mb-2"><i class="fa-solid fa-percent text-sun-700 text-sm"></i></div>
+      <span id="kpi-avg-saving" class="block text-2xl font-bold font-display">0%</span>
+      <span class="text-[11px] text-fog font-semibold" data-i18n="dash_avg_saving">Avg. savings</span>
+    </div>
+    <div class="card p-4">
+      <div class="w-8 h-8 rounded-lg bg-berry-50 flex items-center justify-center mb-2"><i class="fa-solid fa-basket-shopping text-berry-700 text-sm"></i></div>
+      <span id="kpi-items" class="block text-2xl font-bold font-display">0</span>
+      <span class="text-[11px] text-fog font-semibold" data-i18n="dash_avg_items">Avg items / trip</span>
+    </div>
+    <div class="card p-4">
+      <div class="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center mb-2"><i class="fa-solid fa-people-group text-teal-700 text-sm"></i></div>
+      <span id="kpi-crowd" class="block text-2xl font-bold font-display">0</span>
+      <span class="text-[11px] text-fog font-semibold" data-i18n="dash_crowd_routes">Trips using crowd-avoidance</span>
+    </div>
+  </div>
+
+  <div class="grid lg:grid-cols-2 gap-5">
+    <!-- Heatmap -->
+    <div class="card p-4">
+      <h3 class="text-sm font-bold mb-3" data-i18n="dash_heatmap">Rack popularity heatmap</h3>
+      <div class="relative w-full bg-cream rounded-xl overflow-hidden flex items-center justify-center border border-line">
+        <canvas id="heatmap-canvas" width="800" height="600" class="w-full h-auto max-h-[380px] object-contain"></canvas>
+      </div>
+      <div class="flex items-center justify-center gap-2 mt-3 text-[11px] text-ink/60">
+        <span>Low</span>
+        <span class="w-16 h-2 rounded-full" style="background:linear-gradient(90deg,#FFF3C4,#E23B32)"></span>
+        <span>High</span>
+      </div>
+    </div>
+
+    <!-- Top products -->
+    <div class="card p-4">
+      <h3 class="text-sm font-bold mb-3" data-i18n="dash_top_products">Most requested products</h3>
+      <div id="top-products-list" class="space-y-3"></div>
+      <p id="no-data-hint" class="text-xs text-fog italic text-center py-6 hidden">No routes computed yet — analytics will appear once shoppers start using the app.</p>
+    </div>
+  </div>
+</main>
+
+<footer class="border-t border-line bg-paper mt-6">
+  <div class="max-w-6xl mx-auto px-4 py-4 text-[11px] text-fog flex flex-wrap items-center justify-between gap-2">
+    <span>© EasyGo · SuperMart Express</span>
+    <span>Internal tool · not shown to shoppers</span>
+  </div>
+</footer>
+
+<script src="/assets/i18n.js"></script>
+<script src="/assets/store-data.js"></script>
+<script>
+window.addEventListener('DOMContentLoaded', loadAnalytics);
+function onLanguageChange() { loadAnalytics(); }
+
+async function loadAnalytics() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/analytics/summary?store_id=1`);
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    renderKpis(data);
+    renderHeatmap(data.rack_heatmap || []);
+    renderTopProducts(data.top_products || []);
+  } catch (e) {
+    document.getElementById('no-data-hint').classList.remove('hidden');
+  }
+}
+
+function renderKpis(data) {
+  document.getElementById('kpi-routes').textContent = data.total_routes;
+  document.getElementById('kpi-saved').textContent = `${Math.round(data.total_distance_saved_m)} m`;
+  document.getElementById('kpi-avg-saving').textContent = `${data.avg_savings_pct}%`;
+  document.getElementById('kpi-items').textContent = data.avg_items_per_trip;
+  document.getElementById('kpi-crowd').textContent = data.routes_with_crowd_avoidance;
+}
+
+function renderTopProducts(products) {
+  const container = document.getElementById('top-products-list');
+  if (!products.length) {
+    document.getElementById('no-data-hint').classList.remove('hidden');
+    return;
+  }
+  const max = Math.max(...products.map(p => p.requests), 1);
+  container.innerHTML = products.map(p => `
+    <div>
+      <div class="flex items-center justify-between text-xs mb-1">
+        <span class="font-semibold text-ink truncate pr-2">${p.name}</span>
+        <span class="text-fog font-bold shrink-0">${p.requests}</span>
+      </div>
+      <div class="h-2 bg-cream rounded-full overflow-hidden border border-line">
+        <div class="h-full bg-sun rounded-full" style="width:${(p.requests / max * 100).toFixed(0)}%"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderHeatmap(heatmap) {
+  const canvas = document.getElementById('heatmap-canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#FBFAF6'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const counts = {};
+  heatmap.forEach(h => { counts[h.rack_id] = h.visits; });
+  const max = Math.max(...Object.values(counts), 1);
+
+  RACK_LAYOUT.forEach(rack => {
+    const visits = counts[rack.id] || 0;
+    const intensity = visits / max;
+    const color = heatColor(intensity);
+
+    ctx.fillStyle = color;
+    ctx.strokeStyle = '#D8D4C4'; ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(rack.x - rack.width / 2, rack.y - rack.height / 2, rack.width, rack.height, 8);
+    ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle = intensity > 0.55 ? '#fff' : '#17170F';
+    ctx.font = 'bold 12px "Space Grotesk", sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(rack.id, rack.x, rack.y - 6);
+    ctx.font = '9px Inter, sans-serif';
+    ctx.fillText(`${visits} visit${visits === 1 ? '' : 's'}`, rack.x, rack.y + 8);
+  });
+
+  ctx.fillStyle = '#2952E3'; ctx.beginPath(); ctx.arc(ENTRANCE.x, ENTRANCE.y, 16, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.font = 'bold 9px sans-serif'; ctx.fillText('IN', ENTRANCE.x, ENTRANCE.y);
+  ctx.fillStyle = '#E23B32'; ctx.beginPath(); ctx.arc(CHECKOUT.x, CHECKOUT.y, 16, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.font = 'bold 8px sans-serif'; ctx.fillText('PAY', CHECKOUT.x, CHECKOUT.y);
+}
+
+function heatColor(intensity) {
+  // Interpolate cream -> sun -> berry
+  const stops = [
+    { at: 0,   c: [255, 251, 234] },
+    { at: 0.5, c: [255, 195, 0] },
+    { at: 1,   c: [226, 59, 50] }
+  ];
+  let a = stops[0], b = stops[1];
+  if (intensity > 0.5) { a = stops[1]; b = stops[2]; }
+  const local = a === stops[0] ? intensity / 0.5 : (intensity - 0.5) / 0.5;
+  const mix = (i) => Math.round(a.c[i] + (b.c[i] - a.c[i]) * local);
+  return `rgb(${mix(0)},${mix(1)},${mix(2)})`;
+}
+</script>
+</body>
+</html>

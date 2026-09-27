@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Navigate — EasyGo</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>
+  tailwind = { config: { theme: { extend: {
+    colors: {
+      paper: '#FFFFFF', cream: '#FBFAF6', ink: '#17170F', fog: '#8A8A7C', line: '#EAE7DC',
+      sun:   { 50:'#FFFBEA', 100:'#FFF3C4', 300:'#FFDE73', DEFAULT:'#FFC300', 600:'#E6A800', 700:'#B8860B' },
+      sky:   { 50:'#EEF2FF', 100:'#DCE4FF', DEFAULT:'#2952E3', 700:'#1B3AB0' },
+      berry: { 50:'#FDECEC', 100:'#FBD7D5', DEFAULT:'#E23B32', 700:'#B32921' },
+      teal:  { 50:'#ECFDF5', 100:'#D1FAE5', DEFAULT:'#0EA5A5', 700:'#0F766E' }
+    },
+    fontFamily: { display: ['"Space Grotesk"', 'sans-serif'], body: ['Inter', 'sans-serif'] }
+  } } } };
+</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="/assets/common.css">
+</head>
+<body class="bg-cream text-ink antialiased min-h-screen flex flex-col pb-6">
+
+<a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:bg-sun focus:text-ink focus:px-3 focus:py-2 focus:rounded-lg focus:font-semibold">Skip to content</a>
+
+<header class="app-header">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+    <a href="/" class="flex items-center gap-3 min-w-0">
+      <div class="brand-badge"><i class="fa-solid fa-basket-shopping text-ink text-lg"></i></div>
+      <div class="min-w-0">
+        <h1 class="text-lg font-bold tracking-tight leading-none font-display truncate">EasyGo</h1>
+        <p class="text-[11px] text-fog leading-tight mt-0.5" data-i18n="brand_tagline">Shop smarter. Find faster.</p>
+      </div>
+    </a>
+    <div class="flex items-center gap-2.5">
+      <div class="lang-toggle"><button data-lang="en">EN</button><button data-lang="hi">हिं</button></div>
+      <a href="/shop.html" class="btn-ghost px-3 py-1.5 text-xs inline-flex items-center gap-1.5">
+        <i class="fa-solid fa-arrow-left"></i> <span data-i18n="back_to_shop">Back to shopping list</span>
+      </a>
+    </div>
+  </div>
+  <div class="border-t border-line bg-cream">
+    <div class="max-w-7xl mx-auto px-4 py-2 flex items-center gap-2 text-[11px] font-semibold text-ink/60">
+      <span class="step-chip done">1. <span data-i18n="nav_shop">Shop</span></span>
+      <i class="fa-solid fa-chevron-right text-[9px] text-ink/30"></i>
+      <span class="step-chip current">2. <span data-i18n="nav_navigate">Navigate</span></span>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="max-w-7xl mx-auto px-4 py-5 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5 w-full">
+
+  <!-- Empty cart guard -->
+  <div id="empty-guard" class="lg:col-span-12 card p-8 text-center hidden">
+    <i class="fa-solid fa-basket-shopping text-3xl text-sun-600 mb-2"></i>
+    <p class="text-sm font-semibold text-ink">Your shopping list is empty.</p>
+    <a href="/shop.html" class="btn-primary inline-flex items-center gap-2 px-5 py-2.5 text-sm mt-4">
+      <i class="fa-solid fa-basket-shopping"></i> Go pick some products
+    </a>
+  </div>
+
+  <div id="nav-content" class="lg:col-span-12 grid grid-cols-1 lg:grid-cols-12 gap-5">
+    <div class="lg:col-span-7 flex flex-col gap-5">
+      <!-- Map Card -->
+      <div class="card p-4">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <h2 class="text-base font-bold text-ink flex items-center gap-2 font-display">
+              <i class="fa-solid fa-map text-sun-600"></i> <span data-i18n="map_title">Digital store map</span>
+            </h2>
+            <p class="text-xs text-fog" data-i18n="map_sub">SuperMart Express · floor plan view</p>
+          </div>
+          <button onclick="resetWalk(); drawStoreMap();" class="px-3 py-1.5 btn-ghost text-xs" data-i18n="reset">Reset view</button>
+        </div>
+
+        <div class="relative w-full bg-cream rounded-xl overflow-hidden flex items-center justify-center border border-line">
+          <canvas id="store-map" width="800" height="600" class="w-full h-auto max-h-[460px] object-contain"></canvas>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 mt-3 pt-3 border-t border-line">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-ink/70">
+            <div class="flex items-center"><span class="w-2.5 h-2.5 bg-sky rounded-full mr-1.5"></span><span data-i18n="legend_entrance">Entrance</span></div>
+            <div class="flex items-center"><span class="w-2.5 h-2.5 bg-berry rounded-full mr-1.5"></span><span data-i18n="legend_checkout">Checkout</span></div>
+            <div class="flex items-center"><span class="w-4 h-0.5 bg-sky mr-1.5"></span><span data-i18n="legend_path">Optimized path</span></div>
+          </div>
+          <div class="flex items-center gap-2 text-[11px] text-ink/70">
+            <span data-i18n="legend_crowd">Crowd level</span>
+            <span class="crowd-dot crowd-low"></span><span class="crowd-dot crowd-moderate"></span><span class="crowd-dot crowd-high"></span>
+          </div>
+        </div>
+
+        <label class="flex items-center justify-between gap-3 mt-3 p-2.5 bg-cream border border-line rounded-xl cursor-pointer">
+          <span class="text-xs font-semibold text-ink flex items-center gap-2">
+            <i class="fa-solid fa-people-group text-teal-700"></i> <span data-i18n="avoid_crowds">Avoid busy aisles</span>
+          </span>
+          <input type="checkbox" id="avoid-crowds-toggle" class="w-4 h-4 accent-teal-600">
+        </label>
+      </div>
+    </div>
+
+    <div class="lg:col-span-5 flex flex-col gap-5">
+      <!-- Route Info & Directions -->
+      <div id="route-summary-card" class="card p-4 hidden">
+        <div class="grid grid-cols-3 gap-2 mb-3">
+          <div class="bg-cream p-2.5 rounded-xl border border-line text-center">
+            <span class="text-[10px] font-semibold text-fog block" data-i18n="distance_label">Distance</span>
+            <span id="route-distance" class="text-lg font-bold font-display">0 m</span>
+          </div>
+          <div class="bg-cream p-2.5 rounded-xl border border-line text-center">
+            <span class="text-[10px] font-semibold text-fog block" data-i18n="time_label">Est. time</span>
+            <span id="route-time" class="text-lg font-bold font-display">0 min</span>
+          </div>
+          <div class="bg-cream p-2.5 rounded-xl border border-line text-center">
+            <span class="text-[10px] font-semibold text-fog block" data-i18n="stops_label">Stops</span>
+            <span id="route-stops" class="text-lg font-bold font-display">0</span>
+          </div>
+        </div>
+
+        <div id="insights-row" class="flex flex-wrap gap-2 mb-4"></div>
+
+        <div class="bg-ink text-paper rounded-2xl p-4 mb-3">
+          <div class="flex items-center justify-between mb-3">
+            <span id="dir-step-counter" class="text-[11px] font-semibold text-sun uppercase tracking-wide">Step 1</span>
+            <div class="flex items-center gap-1.5">
+              <button onclick="prevLeg()" id="btn-prev-leg" aria-label="Previous step" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+              <button onclick="nextLeg()" id="btn-next-leg" aria-label="Next step" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-sun flex items-center justify-center shrink-0">
+              <i id="dir-arrow" class="fa-solid fa-arrow-up text-ink text-2xl"></i>
+            </div>
+            <div class="min-w-0">
+              <p id="dir-turn-text" class="text-lg font-bold font-display leading-tight">Head to entrance</p>
+              <p id="dir-arrival" class="text-xs text-white/60 mt-0.5 truncate"></p>
+            </div>
+            <div class="ml-auto text-right shrink-0">
+              <span id="dir-distance" class="block text-xl font-bold font-display">0 m</span>
+              <span id="dir-eta" class="block text-[11px] text-white/60">0 min</span>
+            </div>
+          </div>
+          <div class="mt-3 h-1.5 bg-white/10 rounded-full overflow-hidden">
+            <div id="dir-progress-fill" class="h-full bg-sun rounded-full" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 mb-4">
+          <button onclick="toggleWalk()" id="btn-start-walk" class="flex-1 py-2.5 btn-primary text-sm flex items-center justify-center gap-2">
+            <i class="fa-solid fa-play"></i><span data-i18n="start_walk">Start walking simulation</span>
+          </button>
+          <button onclick="toggleVoice()" id="btn-voice-toggle" aria-pressed="false" aria-label="Toggle voice guidance" class="w-11 h-11 btn-ghost flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-volume-xmark"></i>
+          </button>
+          <button onclick="resetWalk()" aria-label="Reset simulation" class="w-11 h-11 btn-ghost flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-rotate-left"></i>
+          </button>
+        </div>
+
+        <h3 class="text-xs font-bold text-ink uppercase tracking-wider mb-2" data-i18n="full_steps">Full route steps</h3>
+        <div id="turn-steps" class="space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar pr-1"></div>
+      </div>
+
+      <div id="pre-route-hint" class="card p-6 text-center">
+        <i class="fa-solid fa-route text-3xl text-sun-600 mb-2 pulse-dot"></i>
+        <p class="text-sm font-semibold text-ink">Calculating your optimized route…</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="border-t border-line bg-paper mt-2">
+  <div class="max-w-7xl mx-auto px-4 py-3 text-[11px] text-fog flex flex-wrap items-center justify-between gap-2">
+    <span>© EasyGo · SuperMart Express</span>
+    <span>Find products easily · Shop with confidence</span>
+  </div>
+</footer>
+
+<script src="/assets/i18n.js"></script>
+<script src="/assets/store-data.js"></script>
+<script>
+let cart = getCart();
+let currentRoute = null;
+let crowdLevels = {}; // rack_id -> 0..1
+let crowdPollTimer = null;
+
+let legs = [], rawSegs = [], segLegIndex = [], cumulative = [0], activeLegIndex = 0;
+let voiceEnabled = false;
+let sim = { running: false, startTime: 0, speed: 0, raf: null };
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (!cart.length) {
+    document.getElementById('empty-guard').classList.remove('hidden');
+    document.getElementById('nav-content').classList.add('hidden');
+    return;
+  }
+  const prefs = getRoutePrefs();
+  document.getElementById('avoid-crowds-toggle').checked = !!prefs.avoid_crowds;
+  document.getElementById('avoid-crowds-toggle').addEventListener('change', (e) => {
+    setRoutePrefs({ avoid_crowds: e.target.checked });
+    requestRoute();
+  });
+
+  initCanvas();
+  pollCrowd();
+  crowdPollTimer = setInterval(pollCrowd, 12000);
+  requestRoute();
+});
+
+function onLanguageChange() { if (currentRoute) displayRouteSummary(currentRoute); }
+
+// ---- Crowd density ----
+async function pollCrowd() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/crowd?store_id=1`);
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    crowdLevels = {};
+    data.racks.forEach(r => { crowdLevels[r.rack_id] = r.level; });
+    drawStoreMap();
+  } catch (e) { /* backend offline - map still works without live overlay */ }
+}
+
+// ---- Route request ----
+async function requestRoute() {
+  const productIds = cart.map(item => item.product_id);
+  const prefs = getRoutePrefs();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/route`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ store_id: 1, start_node: 'ENTRANCE', end_node: 'CHECKOUT', product_ids: productIds, avoid_crowds: prefs.avoid_crowds })
+    });
+    if (!response.ok) throw new Error("Route calculation failed.");
+    currentRoute = await response.json();
+    document.getElementById('pre-route-hint').classList.add('hidden');
+    displayRouteSummary(currentRoute);
+    buildDirections(currentRoute.path_nodes);
+    resetWalk();
+    drawStoreMap();
+  } catch (err) {
+    document.getElementById('pre-route-hint').innerHTML = `
+      <i class="fa-solid fa-triangle-exclamation text-3xl text-berry mb-2"></i>
+      <p class="text-sm font-semibold text-ink">Couldn't reach the route engine.</p>
+      <p class="text-xs text-fog mt-1">Make sure the backend is running, then retry.</p>
+      <button onclick="requestRoute()" class="btn-primary px-4 py-2 text-xs mt-3">Retry</button>`;
+    document.getElementById('pre-route-hint').classList.remove('hidden');
+  }
+}
+
+function displayRouteSummary(route) {
+  document.getElementById('route-summary-card').classList.remove('hidden');
+  document.getElementById('route-distance').textContent = `${Math.round(route.total_distance)} m`;
+  document.getElementById('route-time').textContent = `${Math.max(1, Math.ceil(route.estimated_time_seconds / 60))} min`;
+
+  const activeRacks = [...new Set(cart.map(c => c.rack_id))];
+  document.getElementById('route-stops').textContent = activeRacks.length;
+
+  renderInsights(route);
+
+  const stepsContainer = document.getElementById('turn-steps');
+  stepsContainer.innerHTML = '';
+  let stepIndex = 1;
+  route.path_nodes.forEach(node => {
+    if (node.stop_name || node.node_type === 'ENTRANCE' || node.node_type === 'CHECKOUT') {
+      const stepEl = document.createElement('div');
+      stepEl.className = "flex items-start gap-2.5 p-2 bg-cream border border-line rounded-lg text-xs";
+      let icon = '<i class="fa-solid fa-location-dot text-sun-600"></i>';
+      if (node.node_type === 'ENTRANCE') icon = '<i class="fa-solid fa-door-open text-sky"></i>';
+      if (node.node_type === 'CHECKOUT') icon = '<i class="fa-solid fa-cash-register text-berry"></i>';
+      stepEl.innerHTML = `<div class="mt-0.5">${icon}</div><div class="min-w-0"><span class="font-bold text-ink">Step ${stepIndex++}: </span><span class="text-ink/70">${node.stop_name || node.node_id}</span></div>`;
+      stepsContainer.appendChild(stepEl);
+    }
+  });
+}
+
+function renderInsights(route) {
+  const row = document.getElementById('insights-row');
+  const naive = route.naive_distance || 0;
+  const optimized = route.total_distance;
+  const savedPct = naive > 0 ? Math.round((1 - optimized / naive) * 100) : 0;
+
+  let html = '';
+  if (savedPct <= 2) {
+    html += `<span class="text-xs text-fog px-3 py-1.5 bg-cream border border-line rounded-full"><i class="fa-solid fa-check text-sun-600 mr-1"></i> This is already about as short as it gets</span>`;
+  } else {
+    const stepsSaved = Math.max(0, Math.round((naive - optimized) / 0.75));
+    const timeSavedSec = Math.max(0, Math.round((naive - optimized) / 1.2));
+    html += `<span class="text-xs font-semibold px-3 py-1.5 bg-berry-50 text-berry-700 border border-berry-100 rounded-full">${savedPct}% shorter than aisle-by-aisle</span>`;
+    html += `<span class="text-xs font-semibold px-3 py-1.5 bg-sky-50 text-sky-700 border border-sky-100 rounded-full">≈${stepsSaved} fewer steps</span>`;
+    html += `<span class="text-xs font-semibold px-3 py-1.5 bg-sun-50 text-sun-700 border border-sun-100 rounded-full">${timeSavedSec}s saved</span>`;
+  }
+  if (route.congested_racks_avoided && route.congested_racks_avoided.length) {
+    html += `<span class="text-xs font-semibold px-3 py-1.5 bg-teal-50 text-teal-700 border border-teal-100 rounded-full"><i class="fa-solid fa-people-group mr-1"></i> Routed around ${route.congested_racks_avoided.length} busy aisle${route.congested_racks_avoided.length > 1 ? 's' : ''}</span>`;
+  }
+  row.innerHTML = html;
+}
+
+// ---- Turn-by-turn direction engine ----
+function buildDirections(nodes) {
+  rawSegs = [];
+  for (let i = 0; i < nodes.length - 1; i++) {
+    const a = nodes[i], b = nodes[i + 1];
+    const dx = b.x_pos - a.x_pos, dy = b.y_pos - a.y_pos;
+    rawSegs.push({ from: a, to: b, dx, dy, dist: Math.hypot(dx, dy) });
+  }
+  legs = []; segLegIndex = [];
+  rawSegs.forEach(seg => {
+    const last = legs[legs.length - 1];
+    let sameDirection = false;
+    if (last) {
+      const cross = last.dx * seg.dy - last.dy * seg.dx;
+      const dot = last.dx * seg.dx + last.dy * seg.dy;
+      const ang = Math.atan2(cross, dot) * 180 / Math.PI;
+      sameDirection = Math.abs(ang) < 15 && dot > 0;
+    }
+    if (last && sameDirection) {
+      last.dist += seg.dist; last.to = seg.to;
+      last.dx = last.to.x_pos - last.from.x_pos; last.dy = last.to.y_pos - last.from.y_pos;
+    } else {
+      legs.push({ from: seg.from, to: seg.to, dx: seg.dx, dy: seg.dy, dist: seg.dist });
+    }
+    segLegIndex.push(legs.length - 1);
+  });
+  legs.forEach((leg, idx) => {
+    leg.heading = Math.atan2(leg.dy, leg.dx) * 180 / Math.PI;
+    if (idx === 0) { leg.turn = 'start'; }
+    else {
+      const prev = legs[idx - 1];
+      const cross = prev.dx * leg.dy - prev.dy * leg.dx;
+      const dot = prev.dx * leg.dx + prev.dy * leg.dy;
+      const ang = Math.atan2(cross, dot) * 180 / Math.PI;
+      if (Math.abs(ang) < 20) leg.turn = 'straight';
+      else if (Math.abs(ang) >= 150) leg.turn = 'uturn';
+      else leg.turn = ang > 0 ? 'right' : 'left';
+    }
+    leg.label = leg.to.stop_name || (leg.to.node_type === 'CHECKOUT' ? 'Checkout' : null);
+  });
+  cumulative = [0];
+  rawSegs.forEach(s => cumulative.push(cumulative[cumulative.length - 1] + s.dist));
+  activeLegIndex = 0;
+  showLeg(0);
+}
+
+const TURN_LABELS = { start: 'Head out from entrance', straight: 'Continue straight', left: 'Turn left', right: 'Turn right', uturn: 'Turn around' };
+
+function showLeg(idx) {
+  if (!legs.length) return;
+  activeLegIndex = Math.max(0, Math.min(idx, legs.length - 1));
+  const leg = legs[activeLegIndex];
+  document.getElementById('dir-step-counter').textContent = `Step ${activeLegIndex + 1} of ${legs.length}`;
+  document.getElementById('dir-turn-text').textContent = TURN_LABELS[leg.turn];
+  document.getElementById('dir-arrival').textContent = leg.label || '';
+  document.getElementById('dir-distance').textContent = `${Math.max(1, Math.round(leg.dist))} m`;
+  document.getElementById('dir-eta').textContent = `${Math.max(1, Math.ceil(leg.dist / 1.2 / 60))} min`;
+  document.getElementById('dir-arrow').style.transform = `rotate(${leg.heading + 90}deg)`;
+  document.getElementById('btn-prev-leg').disabled = activeLegIndex === 0;
+  document.getElementById('btn-next-leg').disabled = activeLegIndex === legs.length - 1;
+}
+
+function nextLeg() { showLeg(activeLegIndex + 1); if (sim.running) pauseWalk(); }
+function prevLeg() { showLeg(activeLegIndex - 1); if (sim.running) pauseWalk(); }
+
+// ---- Walking simulation ----
+function toggleWalk() { sim.running ? pauseWalk() : startWalk(); }
+
+function startWalk() {
+  if (!currentRoute || rawSegs.length === 0) return;
+  const total = cumulative[cumulative.length - 1];
+  if (total <= 0) return;
+  sim.running = true;
+  sim.speed = Math.max(total / 9, 12);
+  sim.startTime = performance.now() - (sim.elapsed || 0) * 1000;
+  document.getElementById('btn-start-walk').innerHTML = `<i class="fa-solid fa-pause"></i><span>${t('pause_walk')}</span>`;
+  sim.raf = requestAnimationFrame(simStep);
+}
+
+function pauseWalk() {
+  sim.running = false;
+  if (sim.raf) cancelAnimationFrame(sim.raf);
+  document.getElementById('btn-start-walk').innerHTML = `<i class="fa-solid fa-play"></i><span>${t('resume_walk')}</span>`;
+}
+
+function resetWalk() {
+  sim.running = false; sim.elapsed = 0;
+  if (sim.raf) cancelAnimationFrame(sim.raf);
+  const btn = document.getElementById('btn-start-walk');
+  if (btn) btn.innerHTML = `<i class="fa-solid fa-play"></i><span>${t('start_walk')}</span>`;
+  const fill = document.getElementById('dir-progress-fill');
+  if (fill) fill.style.width = '0%';
+  if (legs.length) showLeg(0);
+  drawStoreMap();
+}
+
+function simStep(now) {
+  if (!sim.running) return;
+  const elapsed = (now - sim.startTime) / 1000;
+  sim.elapsed = elapsed;
+  const total = cumulative[cumulative.length - 1];
+  let d = elapsed * sim.speed;
+
+  if (d >= total) {
+    d = total;
+    drawStoreMap(positionAtDistance(d));
+    document.getElementById('dir-progress-fill').style.width = '100%';
+    showLeg(legs.length - 1);
+    pauseWalk();
+    document.getElementById('btn-start-walk').innerHTML = `<i class="fa-solid fa-flag-checkered"></i><span>Arrived — reset to replay</span>`;
+    if (voiceEnabled) speak("You've arrived at checkout.");
+    return;
+  }
+  drawStoreMap(positionAtDistance(d));
+  document.getElementById('dir-progress-fill').style.width = `${(d / total) * 100}%`;
+  const segIdx = segmentIndexAtDistance(d);
+  const legIdx = segLegIndex[segIdx] ?? legs.length - 1;
+  if (legIdx !== activeLegIndex) {
+    showLeg(legIdx);
+    if (voiceEnabled) speak(buildSpeechText(legs[legIdx]));
+  }
+  sim.raf = requestAnimationFrame(simStep);
+}
+
+function segmentIndexAtDistance(d) {
+  for (let i = 1; i < cumulative.length; i++) { if (d <= cumulative[i]) return i - 1; }
+  return rawSegs.length - 1;
+}
+
+function positionAtDistance(d) {
+  const i = segmentIndexAtDistance(d);
+  const seg = rawSegs[i];
+  if (!seg) return null;
+  const segStart = cumulative[i];
+  const tt = seg.dist > 0 ? (d - segStart) / seg.dist : 0;
+  return { x: seg.from.x_pos + seg.dx * tt, y: seg.from.y_pos + seg.dy * tt };
+}
+
+function toggleVoice() {
+  voiceEnabled = !voiceEnabled;
+  const btn = document.getElementById('btn-voice-toggle');
+  btn.setAttribute('aria-pressed', voiceEnabled ? 'true' : 'false');
+  btn.innerHTML = voiceEnabled ? '<i class="fa-solid fa-volume-high"></i>' : '<i class="fa-solid fa-volume-xmark"></i>';
+  if (voiceEnabled) speak("Voice guidance on.");
+  else if ('speechSynthesis' in window) speechSynthesis.cancel();
+}
+
+function buildSpeechText(leg) {
+  const arrival = leg.label ? `, ${leg.label}` : '';
+  return `${TURN_LABELS[leg.turn]}${arrival}. ${Math.round(leg.dist)} meters.`;
+}
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = getLanguage() === 'hi' ? 'hi-IN' : 'en-IN';
+  utter.rate = 1.05;
+  speechSynthesis.speak(utter);
+}
+
+// ---- Canvas map renderer ----
+let canvas, ctx;
+function initCanvas() { canvas = document.getElementById('store-map'); ctx = canvas.getContext('2d'); drawStoreMap(); }
+
+function drawStoreMap(walkerPos) {
+  if (!ctx) return;
+  ctx.fillStyle = '#FBFAF6'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.strokeStyle = '#EFEBDD'; ctx.lineWidth = 1;
+  for (let x = 0; x < canvas.width; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke(); }
+  for (let y = 0; y < canvas.height; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke(); }
+
+  const cartRackIds = cart.map(item => item.rack_id);
+
+  RACK_LAYOUT.forEach(rack => {
+    const isActive = cartRackIds.includes(rack.id);
+    const level = crowdLevels[rack.id];
+
+    ctx.fillStyle = isActive ? '#FFC300' : '#FFFFFF';
+    ctx.strokeStyle = isActive ? '#17170F' : '#D8D4C4';
+    ctx.lineWidth = isActive ? 2 : 1.5;
+    ctx.beginPath();
+    ctx.roundRect(rack.x - rack.width / 2, rack.y - rack.height / 2, rack.width, rack.height, 8);
+    ctx.fill(); ctx.stroke();
+
+    if (level !== undefined) {
+      ctx.fillStyle = crowdColor(level);
+      ctx.globalAlpha = 0.85;
+      ctx.beginPath();
+      ctx.arc(rack.x + rack.width / 2 - 8, rack.y - rack.height / 2 + 8, 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+
+    ctx.fillStyle = '#17170F';
+    ctx.font = 'bold 12px "Space Grotesk", sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(rack.id, rack.x, rack.y - 6);
+    ctx.font = '9px Inter, sans-serif';
+    ctx.fillStyle = isActive ? '#17170F' : '#8A8A7C';
+    ctx.fillText(rack.label, rack.x, rack.y + 8);
+  });
+
+  ctx.fillStyle = '#2952E3'; ctx.beginPath(); ctx.arc(ENTRANCE.x, ENTRANCE.y, 16, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.font = 'bold 9px sans-serif'; ctx.fillText('IN', ENTRANCE.x, ENTRANCE.y);
+
+  ctx.fillStyle = '#E23B32'; ctx.beginPath(); ctx.arc(CHECKOUT.x, CHECKOUT.y, 16, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.font = 'bold 8px sans-serif'; ctx.fillText('PAY', CHECKOUT.x, CHECKOUT.y);
+
+  if (currentRoute && currentRoute.path_nodes && currentRoute.path_nodes.length > 1) {
+    const nodes = currentRoute.path_nodes;
+    ctx.strokeStyle = '#2952E3'; ctx.lineWidth = 3.5; ctx.setLineDash([9, 7]); ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(nodes[0].x_pos, nodes[0].y_pos);
+    for (let i = 1; i < nodes.length; i++) ctx.lineTo(nodes[i].x_pos, nodes[i].y_pos);
+    ctx.stroke(); ctx.setLineDash([]);
+
+    let stopCounter = 1;
+    nodes.forEach(node => {
+      if (node.stop_name) {
+        ctx.fillStyle = '#E23B32';
+        ctx.beginPath(); ctx.arc(node.x_pos, node.y_pos, 11, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+        ctx.fillStyle = '#fff'; ctx.font = 'bold 10px sans-serif';
+        ctx.fillText(String(stopCounter), node.x_pos, node.y_pos);
+        stopCounter++;
+      }
+    });
+
+    if (walkerPos) {
+      ctx.fillStyle = '#17170F'; ctx.beginPath(); ctx.arc(walkerPos.x, walkerPos.y, 9, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#FFC300'; ctx.beginPath(); ctx.arc(walkerPos.x, walkerPos.y, 5, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop — EasyGo</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>
+  tailwind = { config: { theme: { extend: {
+    colors: {
+      paper: '#FFFFFF', cream: '#FBFAF6', ink: '#17170F', fog: '#8A8A7C', line: '#EAE7DC',
+      sun:   { 50:'#FFFBEA', 100:'#FFF3C4', 300:'#FFDE73', DEFAULT:'#FFC300', 600:'#E6A800', 700:'#B8860B' },
+      sky:   { 50:'#EEF2FF', 100:'#DCE4FF', DEFAULT:'#2952E3', 700:'#1B3AB0' },
+      berry: { 50:'#FDECEC', 100:'#FBD7D5', DEFAULT:'#E23B32', 700:'#B32921' },
+      teal:  { 50:'#ECFDF5', 100:'#D1FAE5', DEFAULT:'#0EA5A5', 700:'#0F766E' }
+    },
+    fontFamily: { display: ['"Space Grotesk"', 'sans-serif'], body: ['Inter', 'sans-serif'] }
+  } } } };
+</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="/assets/common.css">
+</head>
+<body class="bg-cream text-ink antialiased min-h-screen flex flex-col pb-24 lg:pb-6">
+
+<a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:bg-sun focus:text-ink focus:px-3 focus:py-2 focus:rounded-lg focus:font-semibold">Skip to content</a>
+
+<header class="app-header">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+    <a href="/" class="flex items-center gap-3 min-w-0">
+      <div class="brand-badge"><i class="fa-solid fa-basket-shopping text-ink text-lg"></i></div>
+      <div class="min-w-0">
+        <h1 class="text-lg font-bold tracking-tight leading-none font-display truncate">EasyGo</h1>
+        <p class="text-[11px] text-fog leading-tight mt-0.5" data-i18n="brand_tagline">Shop smarter. Find faster.</p>
+      </div>
+    </a>
+    <div class="flex items-center gap-2.5">
+      <div class="lang-toggle"><button data-lang="en">EN</button><button data-lang="hi">हिं</button></div>
+      <span id="api-status-badge" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-sun-50 text-sun-700 border border-sun-100">
+        <span class="w-1.5 h-1.5 bg-sun-600 rounded-full pulse-dot"></span> Connecting…
+      </span>
+    </div>
+  </div>
+  <div class="border-t border-line bg-cream">
+    <div class="max-w-7xl mx-auto px-4 py-2 flex items-center gap-2 text-[11px] font-semibold text-ink/60">
+      <span class="step-chip current">1. <span data-i18n="nav_shop">Shop</span></span>
+      <i class="fa-solid fa-chevron-right text-[9px] text-ink/30"></i>
+      <span class="step-chip upcoming">2. <span data-i18n="nav_navigate">Navigate</span></span>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="max-w-7xl mx-auto px-4 py-5 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5 w-full">
+
+  <div class="lg:col-span-8 flex flex-col gap-5">
+    <!-- Search & Filters -->
+    <div class="card p-4">
+      <label for="search-input" class="block text-sm font-semibold text-ink mb-2">
+        <i class="fa-solid fa-magnifying-glass text-sun-600 mr-1"></i> <span data-i18n="search_label">Find products</span>
+      </label>
+      <div class="relative">
+        <input type="text" id="search-input" data-i18n-placeholder="search_placeholder" placeholder="Search milk, Maggi, Surf Excel, salt…"
+               class="w-full pl-10 pr-11 py-2.5 bg-cream border border-line rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sun focus:bg-white transition-all"
+               oninput="handleSearch(this.value)">
+        <i class="fa-solid fa-search text-fog absolute left-3.5 top-3.5 text-sm"></i>
+        <button id="voice-search-btn" aria-label="Voice search" title="Voice search"
+                class="absolute right-2 top-1.5 w-8 h-8 rounded-lg flex items-center justify-center text-fog hover:text-sun-700 hover:bg-sun-50 transition-colors">
+          <i class="fa-solid fa-microphone"></i>
+        </button>
+      </div>
+      <div id="category-pills" class="flex items-center gap-2 mt-3 overflow-x-auto custom-scrollbar pb-1">
+        <button class="cat-pill active" data-cat="ALL" data-i18n="cat_all">All</button>
+        <button class="cat-pill" data-cat="Dairy" data-i18n="cat_dairy">Dairy</button>
+        <button class="cat-pill" data-cat="Grocery" data-i18n="cat_grocery">Grocery</button>
+        <button class="cat-pill" data-cat="Snacks" data-i18n="cat_snacks">Snacks</button>
+        <button class="cat-pill" data-cat="Household" data-i18n="cat_household">Household</button>
+      </div>
+    </div>
+
+    <!-- Product Catalog Grid -->
+    <div class="card p-4 flex-1 flex flex-col min-h-[420px]">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-sm font-bold text-ink" data-i18n="products_title">Available products</h2>
+        <span id="product-count" class="text-xs text-fog">0 items available</span>
+      </div>
+      <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-4 overflow-y-auto max-h-[620px] p-1 custom-scrollbar">
+        <!-- Products rendered via JS -->
+      </div>
+    </div>
+  </div>
+
+  <div class="lg:col-span-4 flex flex-col gap-5">
+    <!-- Budget tracker -->
+    <div class="card p-4">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-sm font-bold text-ink flex items-center gap-2">
+          <i class="fa-solid fa-wallet text-berry-700"></i> <span data-i18n="budget_title">Budget</span>
+        </h2>
+        <button id="set-budget-btn" class="text-xs text-sky font-medium hover:underline" data-i18n="budget_set">Set limit</button>
+      </div>
+      <div class="flex items-end justify-between mb-2">
+        <span id="cart-total" class="text-2xl font-bold font-display">₹0</span>
+        <span id="budget-status" class="text-xs font-semibold text-fog"></span>
+      </div>
+      <div class="h-2 bg-cream rounded-full overflow-hidden border border-line">
+        <div id="budget-bar" class="h-full bg-teal rounded-full transition-all" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- Shopping List -->
+    <div class="card p-4 flex-1 flex flex-col">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-sm font-bold text-ink flex items-center gap-2">
+          <i class="fa-solid fa-list-check text-sun-600"></i> <span data-i18n="cart_title">Shopping list</span>
+          <span id="cart-badge" class="bg-sun-100 text-sun-700 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+        </h2>
+        <button onclick="clearCartUI()" class="text-xs text-berry font-medium hover:underline" data-i18n="cart_clear">Clear all</button>
+      </div>
+
+      <div id="cart-list" class="space-y-2 flex-1 overflow-y-auto custom-scrollbar pr-1 mb-4 min-h-[120px]">
+        <p class="text-xs text-fog italic text-center py-4" data-i18n="cart_empty">No products selected yet — tap products above to add them.</p>
+      </div>
+
+      <button onclick="goToRoute()" id="find-route-btn" disabled
+              class="hidden lg:flex w-full py-3 px-4 btn-primary text-sm items-center justify-center gap-2">
+        <i class="fa-solid fa-route"></i>
+        <span data-i18n="find_route">Find my optimized route</span>
+      </button>
+    </div>
+  </div>
+</main>
+
+<!-- Mobile sticky action bar -->
+<div id="mobile-cta-bar" class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-paper border-t-2 border-ink px-4 py-3 flex items-center gap-3">
+  <div class="min-w-0">
+    <span id="mobile-cart-count" class="block text-sm font-bold leading-tight">0 items</span>
+    <span class="block text-[11px] text-fog leading-tight">₹0</span>
+  </div>
+  <button onclick="goToRoute()" id="mobile-find-route-btn" disabled class="flex-1 py-3 btn-primary text-sm flex items-center justify-center gap-2">
+    <i class="fa-solid fa-route"></i><span data-i18n="find_route">Find route</span>
+  </button>
+</div>
+
+<script src="/assets/i18n.js"></script>
+<script src="/assets/store-data.js"></script>
+<script>
+let allProducts = [];
+let filteredProducts = [];
+let cart = getCart();
+
+window.addEventListener('DOMContentLoaded', () => {
+  fetchAvailableProducts();
+  updateCartUI();
+  updateBudgetUI();
+  document.getElementById('category-pills').addEventListener('click', (e) => {
+    const btn = e.target.closest('.cat-pill');
+    if (!btn) return;
+    document.querySelectorAll('.cat-pill').forEach(el => el.classList.remove('active'));
+    btn.classList.add('active');
+    filterCategory(btn.dataset.cat);
+  });
+  document.getElementById('set-budget-btn').addEventListener('click', promptBudget);
+  setupVoiceSearch();
+});
+
+function onLanguageChange() { renderProducts(); updateCartUI(); updateBudgetUI(); }
+
+// ---- Fetch & render products ----
+async function fetchAvailableProducts() {
+  const badge = document.getElementById('api-status-badge');
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/products/available`);
+    if (!res.ok) throw new Error("API offline");
+    const raw = await res.json();
+    // Client-side dedupe by name (safety if DB still has old duplicates)
+    const seen = new Set();
+    allProducts = raw.filter(p => {
+      const key = (p.name || '').trim().toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+    filteredProducts = [...allProducts];
+    renderProducts();
+    if (badge) {
+      badge.className = "hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100";
+      badge.innerHTML = `<span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span> API connected`;
+    }
+  } catch (err) {
+    if (badge) {
+      badge.className = "hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-berry-50 text-berry-700 border border-berry-100";
+      badge.innerHTML = `<span class="w-1.5 h-1.5 bg-berry rounded-full"></span> API offline`;
+    }
+  }
+}
+
+function renderProducts() {
+  const grid = document.getElementById('product-grid');
+  const countLabel = document.getElementById('product-count');
+  grid.innerHTML = '';
+  countLabel.textContent = `${filteredProducts.length} items`;
+
+  if (filteredProducts.length === 0) {
+    grid.innerHTML = `<p class="col-span-full text-sm text-fog text-center py-10">No matching products found.</p>`;
+    return;
+  }
+
+  filteredProducts.forEach(prod => {
+    const isSelected = cart.some(item => item.product_id === prod.product_id);
+    const lowStock = prod.stock > 0 && prod.stock <= 5;
+
+    const card = document.createElement('div');
+    card.className = `group product-card overflow-hidden rounded-2xl border bg-white cursor-pointer transition-all fade-in ${
+      isSelected ? 'border-sun ring-2 ring-sun/30 shadow-sm' : 'border-line hover:border-ink/20 hover:shadow-md'
+    }`;
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+    card.onclick = () => toggleCartItem(prod);
+    card.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleCartItem(prod); } };
+
+    card.innerHTML = `
+      <div class="p-3 flex flex-col gap-1.5">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-cream text-ink border border-line">Rack ${prod.rack_id}</span>
+          <span class="text-base font-bold font-display text-ink">₹${Number(prod.price).toFixed(0)}</span>
+        </div>
+        <h3 class="text-sm font-bold text-ink leading-snug line-clamp-2 min-h-[2.5rem]">${prod.name}</h3>
+        <p class="text-[11px] text-fog font-medium truncate">${prod.brand || prod.category}</p>
+        <div class="flex items-center justify-between mt-1">
+          <p class="text-[10px] ${lowStock ? 'text-berry font-semibold' : 'text-fog'}">${lowStock ? `Only ${prod.stock} left` : 'In stock'}</p>
+          <span class="text-xs font-bold px-2.5 py-1 rounded-lg flex items-center gap-1 ${isSelected ? 'bg-sun text-ink' : 'bg-ink text-white'}">
+            ${isSelected ? '<i class="fa-solid fa-check text-[10px]"></i> Added' : '+ Add'}
+          </span>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function handleSearch(query) {
+  const q = query.toLowerCase().trim();
+  filteredProducts = allProducts.filter(p =>
+    p.name.toLowerCase().includes(q) ||
+    p.category.toLowerCase().includes(q) ||
+    (p.brand && p.brand.toLowerCase().includes(q))
+  );
+  renderProducts();
+}
+
+function filterCategory(cat) {
+  filteredProducts = cat === 'ALL' ? [...allProducts] : allProducts.filter(p => p.category.toLowerCase() === cat.toLowerCase());
+  renderProducts();
+}
+
+// ---- Voice search (Web Speech API) ----
+function setupVoiceSearch() {
+  const btn = document.getElementById('voice-search-btn');
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) { btn.style.display = 'none'; return; }
+
+  const recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+
+  btn.addEventListener('click', () => {
+    recognition.lang = getLanguage() === 'hi' ? 'hi-IN' : 'en-IN';
+    btn.classList.add('text-berry');
+    btn.innerHTML = '<i class="fa-solid fa-microphone-lines"></i>';
+    try { recognition.start(); } catch (e) { /* already running */ }
+  });
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    const input = document.getElementById('search-input');
+    input.value = transcript;
+    handleSearch(transcript);
+  };
+  recognition.onend = () => {
+    btn.classList.remove('text-berry');
+    btn.innerHTML = '<i class="fa-solid fa-microphone"></i>';
+  };
+  recognition.onerror = () => {
+    btn.classList.remove('text-berry');
+    btn.innerHTML = '<i class="fa-solid fa-microphone"></i>';
+  };
+}
+
+// ---- Cart management ----
+function toggleCartItem(prod) {
+  const idx = cart.findIndex(item => item.product_id === prod.product_id);
+  if (idx > -1) cart.splice(idx, 1);
+  else cart.push(prod);
+  setCart(cart);
+  updateCartUI();
+  updateBudgetUI();
+  renderProducts();
+}
+
+function clearCartUI() {
+  cart = [];
+  setCart(cart);
+  updateCartUI();
+  updateBudgetUI();
+  renderProducts();
+}
+
+function updateCartUI() {
+  const cartList = document.getElementById('cart-list');
+  const cartBadge = document.getElementById('cart-badge');
+  const routeBtn = document.getElementById('find-route-btn');
+  const mobileBtn = document.getElementById('mobile-find-route-btn');
+  const mobileCount = document.getElementById('mobile-cart-count');
+
+  cartBadge.textContent = cart.length;
+  routeBtn.disabled = cart.length === 0;
+  mobileBtn.disabled = cart.length === 0;
+  mobileCount.textContent = `${cart.length} item${cart.length === 1 ? '' : 's'}`;
+  mobileCount.nextElementSibling.textContent = `₹${cartTotal(cart).toFixed(0)}`;
+
+  if (cart.length === 0) {
+    cartList.innerHTML = `<p class="text-xs text-fog italic text-center py-4">${t('cart_empty')}</p>`;
+    return;
+  }
+
+  cartList.innerHTML = '';
+  cart.forEach(item => {
+    const el = document.createElement('div');
+    el.className = "flex items-center justify-between p-2 bg-cream border border-line rounded-lg text-xs fade-in";
+    el.innerHTML = `
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="font-bold text-ink bg-sun-100 px-1.5 py-0.5 rounded border border-sun-300 text-[10px] shrink-0">${item.rack_id}</span>
+        <span class="font-medium text-ink truncate">${item.name}</span>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <span class="text-ink/60 font-semibold">₹${item.price}</span>
+        <button onclick="removeFromCart(${item.product_id})" aria-label="Remove ${item.name}" class="text-fog hover:text-berry">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    `;
+    cartList.appendChild(el);
+  });
+}
+
+function removeFromCart(productId) {
+  cart = cart.filter(item => item.product_id !== productId);
+  setCart(cart);
+  updateCartUI();
+  updateBudgetUI();
+  renderProducts();
+}
+
+// ---- Budget tracker ----
+function promptBudget() {
+  const current = getBudget();
+  const val = window.prompt(t('budget_set') + ' (₹)', current ? String(current) : '500');
+  if (val === null) return;
+  const num = parseFloat(val);
+  setBudget(isNaN(num) || num <= 0 ? null : num);
+  updateBudgetUI();
+}
+
+function updateBudgetUI() {
+  const total = cartTotal(cart);
+  document.getElementById('cart-total').textContent = `₹${total.toFixed(0)}`;
+  const budget = getBudget();
+  const bar = document.getElementById('budget-bar');
+  const status = document.getElementById('budget-status');
+
+  if (!budget) {
+    bar.style.width = '0%';
+    bar.className = 'h-full bg-line rounded-full transition-all';
+    status.textContent = '';
+    return;
+  }
+
+  const pct = Math.min(100, (total / budget) * 100);
+  bar.style.width = `${pct}%`;
+  if (total > budget) {
+    bar.className = 'h-full bg-berry rounded-full transition-all';
+    status.textContent = `₹${(total - budget).toFixed(0)} ${t('budget_over')}`;
+    status.className = 'text-xs font-semibold text-berry';
+  } else {
+    bar.className = 'h-full bg-teal rounded-full transition-all';
+    status.textContent = `₹${(budget - total).toFixed(0)} ${t('budget_remaining')}`;
+    status.className = 'text-xs font-semibold text-teal-700';
+  }
+}
+
+// ---- Proceed to navigation page ----
+function goToRoute() {
+  if (cart.length === 0) return;
+  setCart(cart);
+  window.location.href = '/navigate.html';
+}
+</script>
+</body>
+</html>

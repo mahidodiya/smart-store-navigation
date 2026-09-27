@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EasyGo — Find products. Shop smarter.</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>
+  tailwind = { config: { theme: { extend: {
+    colors: {
+      paper: '#FFFFFF', cream: '#FBFAF6', ink: '#17170F', fog: '#8A8A7C', line: '#EAE7DC',
+      sun:   { 50:'#FFFBEA', 100:'#FFF3C4', 300:'#FFDE73', DEFAULT:'#FFC300', 600:'#E6A800', 700:'#B8860B' },
+      sky:   { 50:'#EEF2FF', 100:'#DCE4FF', DEFAULT:'#2952E3', 700:'#1B3AB0' },
+      berry: { 50:'#FDECEC', 100:'#FBD7D5', DEFAULT:'#E23B32', 700:'#B32921' },
+      teal:  { 50:'#ECFDF5', 100:'#D1FAE5', DEFAULT:'#0EA5A5', 700:'#0F766E' }
+    },
+    fontFamily: { display: ['"Space Grotesk"', 'sans-serif'], body: ['Inter', 'sans-serif'] }
+  } } } };
+</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="/assets/common.css">
+</head>
+<body class="bg-cream text-ink antialiased min-h-screen flex flex-col">
+
+<a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:bg-sun focus:text-ink focus:px-3 focus:py-2 focus:rounded-lg focus:font-semibold">Skip to content</a>
+
+<header class="app-header">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="brand-badge"><i class="fa-solid fa-basket-shopping text-ink text-lg"></i></div>
+      <div class="min-w-0">
+        <h1 class="text-lg font-bold tracking-tight leading-none font-display truncate">EasyGo</h1>
+        <p class="text-[11px] text-fog leading-tight mt-0.5" data-i18n="brand_tagline">Shop smarter. Find faster.</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="lang-toggle"><button data-lang="en">EN</button><button data-lang="hi">हिं</button></div>
+      <a href="/dashboard.html" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-ink/70 hover:text-ink">
+        <i class="fa-solid fa-chart-simple"></i> <span data-i18n="nav_dashboard">Manager view</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="flex-1">
+
+  <!-- Hero -->
+  <section class="max-w-6xl mx-auto px-4 pt-14 pb-16 grid md:grid-cols-2 gap-10 items-center">
+    <div>
+      <span class="inline-flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-full bg-sun-50 text-sun-700 border border-sun-100 mb-5">
+        <i class="fa-solid fa-store"></i> Welcome to your store
+      </span>
+      <h2 class="text-4xl sm:text-5xl font-bold font-display leading-[1.08] mb-5" data-i18n="hero_title">
+        Find what you need — without the search
+      </h2>
+      <p class="text-base text-ink/70 leading-relaxed mb-8 max-w-lg" data-i18n="hero_sub">
+        Welcome to the store. Search for products, add them to your list, and we’ll show you the quickest path through the aisles — so you spend less time walking and more time shopping.
+      </p>
+      <div class="flex flex-wrap items-center gap-3">
+        <a href="/shop.html" class="btn-primary px-6 py-3.5 text-sm inline-flex items-center gap-2">
+          <i class="fa-solid fa-basket-shopping"></i> <span data-i18n="hero_cta">Start shopping</span>
+        </a>
+        <a href="/dashboard.html" class="btn-ghost px-6 py-3.5 text-sm inline-flex items-center gap-2">
+          <i class="fa-solid fa-chart-simple"></i> <span data-i18n="hero_cta_sub">Store Manager dashboard</span>
+        </a>
+      </div>
+      <span id="api-status-badge" class="inline-flex items-center gap-1.5 mt-6 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-sun-50 text-sun-700 border border-sun-100">
+        <span class="w-1.5 h-1.5 bg-sun-600 rounded-full pulse-dot"></span> Checking backend…
+      </span>
+    </div>
+
+    <div class="relative">
+      <div class="card-glow p-5 float-slow">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-bold text-fog uppercase tracking-wide">Live route preview</span>
+          <span class="crowd-dot crowd-moderate"></span>
+        </div>
+        <svg viewBox="0 0 400 300" class="w-full h-auto rounded-xl bg-cream border border-line">
+          <g stroke="#EFEBDD"><line x1="0" y1="60" x2="400" y2="60"/><line x1="0" y1="120" x2="400" y2="120"/><line x1="0" y1="180" x2="400" y2="180"/><line x1="0" y1="240" x2="400" y2="240"/></g>
+          <rect x="30" y="30" width="70" height="26" rx="6" fill="#fff" stroke="#D8D4C4"/>
+          <rect x="150" y="30" width="70" height="26" rx="6" fill="#FFC300" stroke="#17170F" stroke-width="1.5"/>
+          <rect x="270" y="30" width="70" height="26" rx="6" fill="#fff" stroke="#D8D4C4"/>
+          <rect x="30" y="140" width="70" height="26" rx="6" fill="#FFC300" stroke="#17170F" stroke-width="1.5"/>
+          <rect x="150" y="140" width="70" height="26" rx="6" fill="#fff" stroke="#D8D4C4"/>
+          <rect x="270" y="140" width="70" height="26" rx="6" fill="#fff" stroke="#D8D4C4"/>
+          <circle cx="60" cy="260" r="12" fill="#2952E3"/><text x="60" y="264" font-size="8" fill="#fff" text-anchor="middle" font-weight="700">IN</text>
+          <circle cx="340" cy="260" r="12" fill="#E23B32"/><text x="340" y="264" font-size="7" fill="#fff" text-anchor="middle" font-weight="700">PAY</text>
+          <path d="M60 260 L65 153 L185 153 L185 43 L340 43 L340 260" fill="none" stroke="#2952E3" stroke-width="3" stroke-dasharray="8 6" stroke-linecap="round"/>
+        </svg>
+        <div class="grid grid-cols-3 gap-2 mt-4 text-center">
+          <div class="bg-cream rounded-xl border border-line p-2"><span class="block text-[10px] text-fog font-semibold">Distance</span><span class="text-sm font-bold font-display">142 m</span></div>
+          <div class="bg-cream rounded-xl border border-line p-2"><span class="block text-[10px] text-fog font-semibold">Time</span><span class="text-sm font-bold font-display">2 min</span></div>
+          <div class="bg-cream rounded-xl border border-line p-2"><span class="block text-[10px] text-fog font-semibold">Saved</span><span class="text-sm font-bold font-display text-teal-700">38%</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feature grid -->
+  <section class="max-w-6xl mx-auto px-4 pb-16">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="card p-5">
+        <div class="w-10 h-10 rounded-xl bg-sky-50 flex items-center justify-center mb-3"><i class="fa-solid fa-route text-sky"></i></div>
+        <h3 class="text-sm font-bold mb-1" data-i18n="feat_route_title">Smartest path in store</h3>
+        <p class="text-xs text-fog leading-relaxed" data-i18n="feat_route_sub">We plan the shortest walk so you hit every item without backtracking</p>
+      </div>
+      <div class="card p-5">
+        <div class="w-10 h-10 rounded-xl bg-sun-50 flex items-center justify-center mb-3"><i class="fa-solid fa-diamond-turn-right text-sun-700"></i></div>
+        <h3 class="text-sm font-bold mb-1" data-i18n="feat_live_title">Turn-by-turn guidance</h3>
+        <p class="text-xs text-fog leading-relaxed" data-i18n="feat_live_sub">Clear step-by-step directions — with optional voice prompts</p>
+      </div>
+      <div class="card p-5">
+        <div class="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center mb-3"><i class="fa-solid fa-people-group text-teal-700"></i></div>
+        <h3 class="text-sm font-bold mb-1" data-i18n="feat_crowd_title">Avoid busy aisles</h3>
+        <p class="text-xs text-fog leading-relaxed" data-i18n="feat_crowd_sub">Routes can skip crowded sections so you move faster</p>
+      </div>
+      <div class="card p-5">
+        <div class="w-10 h-10 rounded-xl bg-berry-50 flex items-center justify-center mb-3"><i class="fa-solid fa-wallet text-berry-700"></i></div>
+        <h3 class="text-sm font-bold mb-1" data-i18n="feat_budget_title">Budget tracker</h3>
+        <p class="text-xs text-fog leading-relaxed" data-i18n="feat_budget_sub">See your running total as you shop and set a spend limit</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="border-t border-line bg-paper">
+  <div class="max-w-6xl mx-auto px-4 py-4 text-[11px] text-fog flex flex-wrap items-center justify-between gap-2">
+    <span>© EasyGo · SuperMart Express</span>
+    <span>Find products easily · Shop with confidence</span>
+  </div>
+</footer>
+
+<script src="/assets/i18n.js"></script>
+<script src="/assets/store-data.js"></script>
+<script>
+  (async function checkApi() {
+    const badge = document.getElementById('api-status-badge');
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/health`);
+      if (!res.ok) throw new Error('offline');
+      badge.className = "inline-flex items-center gap-1.5 mt-6 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100";
+      badge.innerHTML = `<span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span> API connected`;
+    } catch (e) {
+      badge.className = "inline-flex items-center gap-1.5 mt-6 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-berry-50 text-berry-700 border border-berry-100";
+      badge.innerHTML = `<span class="w-1.5 h-1.5 bg-berry rounded-full"></span> API offline — start the backend`;
+    }
+  })();
+</script>
+</body>
+</html>

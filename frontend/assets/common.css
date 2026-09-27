@@ -1,0 +1,109 @@
+/* ==========================================================================
+   EasyGo — shared design tokens & components
+   Loaded on every page alongside the Tailwind CDN config in each <head>.
+   ========================================================================== */
+
+* { -webkit-tap-highlight-color: transparent; }
+html, body { background: #FBFAF6; }
+body { font-family: 'Inter', sans-serif; }
+h1, h2, h3, .font-display { font-family: 'Space Grotesk', sans-serif; }
+
+.custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #E6DFC9; border-radius: 4px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #FFC300; }
+
+:focus-visible { outline: 3px solid #2952E3; outline-offset: 2px; border-radius: 4px; }
+
+/* --- Buttons --- */
+.btn-primary {
+  background: linear-gradient(180deg, #FFD53D 0%, #FFC300 100%);
+  color: #17170F; font-weight: 700; border-radius: 12px;
+  box-shadow: 0 2px 0 #B8860B, 0 6px 16px -6px rgba(255,195,0,.55);
+  transition: transform .1s ease, box-shadow .15s ease, background .15s ease;
+}
+.btn-primary:hover:not(:disabled) { background: linear-gradient(180deg, #FFDE73 0%, #E6A800 100%); }
+.btn-primary:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 0 0 #B8860B; }
+.btn-primary:disabled { background: #EFEEE6; color: #B7B4A5; box-shadow: none; cursor: not-allowed; }
+
+.btn-ghost {
+  background: #fff; color: #17170F; border: 1.5px solid #EAE7DC; border-radius: 12px; font-weight: 600;
+  transition: border-color .15s ease, background .15s ease;
+}
+.btn-ghost:hover { border-color: #17170F; }
+.btn-ghost[aria-pressed="true"] { background: #17170F; color: #fff; border-color: #17170F; }
+
+.btn-dark {
+  background: #17170F; color: #fff; border-radius: 12px; font-weight: 700;
+  transition: transform .1s ease, background .15s ease;
+}
+.btn-dark:hover { background: #2b2b1e; }
+.btn-dark:active { transform: scale(.98); }
+
+/* --- Cards & surfaces --- */
+.card {
+  background: #fff; border: 1.5px solid #EAE7DC; border-radius: 18px;
+  box-shadow: 0 1px 2px rgba(23,23,15,.03);
+}
+.card-glow {
+  background: #fff; border: 1.5px solid #EAE7DC; border-radius: 18px;
+  box-shadow: 0 12px 32px -16px rgba(23,23,15,.18);
+}
+
+.cat-pill {
+  flex-shrink: 0; font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 999px;
+  border: 1.5px solid #EAE7DC; background: #fff; color: #17170F; white-space: nowrap; transition: all .15s ease;
+}
+.cat-pill.active { background: #FFC300; border-color: #FFC300; color: #17170F; }
+.cat-pill:not(.active):hover { border-color: #FFC300; }
+
+/* --- Header shared across pages --- */
+.app-header { background: #FFFFFF; border-bottom: 2px solid #17170F; position: sticky; top: 0; z-index: 40; }
+.brand-badge {
+  width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(145deg, #FFDE73, #FFC300); border: 2px solid #17170F; flex-shrink: 0;
+}
+.step-chip {
+  font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; border: 1.5px solid transparent;
+}
+.step-chip.done { background: #ECFDF5; color: #047857; border-color: #A7F3D0; }
+.step-chip.current { background: #17170F; color: #FFC300; }
+.step-chip.upcoming { background: #F5F4EE; color: #9A9788; }
+
+/* --- Motion --- */
+.pulse-dot { animation: pulse-dot 1.6s ease-in-out infinite; }
+@keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+
+.fade-in { animation: fade-in .28s ease both; }
+@keyframes fade-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+.float-slow { animation: float-slow 6s ease-in-out infinite; }
+@keyframes float-slow { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+#dir-arrow { transition: transform .35s cubic-bezier(.2,.7,.3,1); transform-origin: 50% 50%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-dot, .fade-in, .float-slow, #dir-arrow { animation: none !important; transition: none !important; }
+}
+
+::selection { background: #FFC300; color: #17170F; }
+
+/* --- Crowd-density legend dots --- */
+.crowd-dot { width: 9px; height: 9px; border-radius: 999px; display: inline-block; }
+.crowd-low { background: #22C55E; }
+.crowd-moderate { background: #F59E0B; }
+.crowd-high { background: #E23B32; }
+
+/* --- Language toggle --- */
+.lang-toggle {
+  display: inline-flex; border: 1.5px solid #EAE7DC; border-radius: 999px; overflow: hidden; font-size: 11px; font-weight: 700;
+}
+.lang-toggle button { padding: 5px 10px; background: #fff; color: #8A8A7C; }
+.lang-toggle button.active { background: #17170F; color: #FFC300; }
+
+/* --- Product cards (shop page) --- */
+.product-card { box-shadow: 0 1px 2px rgba(23,23,15,.04); }
+.product-card:hover { box-shadow: 0 8px 24px -12px rgba(23,23,15,.18); }
+.product-card .line-clamp-2 {
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
