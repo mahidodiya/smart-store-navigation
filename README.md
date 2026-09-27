@@ -1,71 +1,50 @@
-# SmartStore Nav
+# SmartStore Navigation
 
-Indoor store navigation web app: pick products, and get the shortest walking
-route through the store (A* pathfinding + Nearest-Neighbor/2-opt route
-optimization), shown live on an interactive floor-plan map — with crowd-aware
-routing, a live budget tracker, voice search, Hindi/English support, and a
-store-manager analytics dashboard.
+Indoor store navigation web app. Shoppers pick products from a catalog and
+get the shortest walking route through the store, shown on an interactive
+floor-plan map. It combines a product-selection/cart flow, A*-based route
+optimization with crowd-aware rerouting, a live budget tracker, voice
+search, Hindi/English support, and a store-manager analytics dashboard.
 
-## What's new in this version
+## Why it helps
 
-- **Multi-page flow** — Landing → Shop → Navigate, instead of one crowded page.
-  The map now lives on its own dedicated `/navigate.html` page.
-- **Crowd-aware routing** — simulated live footfall per rack; toggle "Avoid
-  busy aisles" and the A* engine re-routes around congested nodes.
-- **Store-manager dashboard** (`/dashboard.html`) — a rack popularity heatmap,
-  top-requested products, and aggregate distance/time savings across all
-  shoppers, powered by a new `route_logs` table.
-- **Budget tracker** — set a spend limit on the shop page and watch a live bar
-  as you add items, with an over-budget warning.
-- **Voice search** — tap the mic on the shop page's search box (uses the
-  browser's Web Speech API).
-- **Hindi / English toggle** — every page has an EN/हिं switch in the header.
+In a large store you usually know *what* you want but not *where* it is or
+the fastest order to collect it all. This app solves that instead of just
+showing a map:
+
+- **Products are tagged with a rack location**, so a shopper always knows
+  where an item lives.
+- **The route engine plans the whole trip, not just one item** — A*
+  pathfinding models the store as a graph, and Nearest-Neighbor + 2-opt
+  decide the best *order* to visit every selected rack in, so the shopper
+  walks the shortest total path instead of crisscrossing the store.
+- **Crowd-aware rerouting** avoids congested aisles when possible, cutting
+  down time lost waiting in busy spots.
+- **The budget tracker** shows a running total against a set limit while
+  items are added, so there are no checkout surprises.
 
 ## Project structure
 
 ```
 backend/
   app/
-    main.py         FastAPI app + routes (products, racks, route, crowd, analytics)
-    models.py        SQLAlchemy models (+ RouteLog for analytics)
-    schemas.py        Pydantic request/response models
-    navigation.py     A* + Nearest-Neighbor + 2-opt route engine + crowd simulation
-    seed.py            First-boot demo data seeding
-    database.py        DB engine/session setup
+    main.py           FastAPI app + routes (products, racks, route, crowd, analytics)
+    models.py         SQLAlchemy models
+    schemas.py         Pydantic request/response models
+    navigation.py       Route engine (A*, Nearest-Neighbor, 2-opt) + crowd simulation
+    seed.py               First-boot demo data seeding
+    database.py           DB engine/session setup
   requirements.txt
-  .env                 Local-only DB config (not used on Render)
+  .env                     Local-only DB config
 frontend/
-  index.html            Landing page
-  shop.html             Product selection, cart, budget tracker, voice search
-  navigate.html         Map, turn-by-turn directions, crowd overlay, walking sim
-  dashboard.html        Store-manager analytics (heatmap, top products)
+  index.html                Landing page
+  shop.html                 Product selection, cart, budget tracker, voice search
+  navigate.html              Map, turn-by-turn directions, crowd overlay
+  dashboard.html              Store-manager analytics (heatmap, top products)
   assets/
-    common.css          Shared design tokens & components
-    i18n.js             English/Hindi translation dictionary + toggle
-    store-data.js        Shared rack layout + cart/budget persistence (localStorage)
-schema.sql             Reference schema/seed (kept for manual psql use too)
-render.yaml            Render Blueprint: web service + free Postgres
+    common.css                 Shared design tokens & components
+    i18n.js                    English/Hindi translation dictionary + toggle
+    store-data.js               Shared rack layout + cart/budget persistence
+schema.sql                Reference DB schema/seed
+render.yaml                Render Blueprint (web service + Postgres)
 ```
-
-## Running locally
-
-```
-cd backend
-python -m venv venv && source venv/bin/activate   # or venv\Scripts\activate on Windows
-pip install -r requirements.txt
-uvicorn app.main:app --reload
-```
-
-Then open http://localhost:8000 — FastAPI serves the whole `frontend/`
-directory (every page and the `assets/` folder), so no separate frontend
-server or build step is needed.
-
-### New API endpoints
-
-- `GET /api/crowd?store_id=1` — simulated live congestion per rack.
-- `POST /api/route` — now accepts `avoid_crowds: true` and logs the trip.
-- `GET /api/analytics/summary?store_id=1` — aggregated dashboard data.
-
-The cart, budget limit, and "avoid crowds" preference are kept in the
-browser's `localStorage` (key names in `assets/store-data.js`) so they carry
-across the Shop → Navigate page transition without needing a backend session.
